@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using AdvancedDevSample.Domain.Execptions;
+using AdvancedDevSample.Domain.ValueObjects;
 
 namespace AdvancedDevSample.Domain.Entities
 {
@@ -10,31 +9,32 @@ namespace AdvancedDevSample.Domain.Entities
         /// <summary>
         /// Représente un produit vendable.
         /// </summary>
-        
         public Guid Id { get; private set; } // Identité
-        public Decimal Price { get; private set; }
-        public bool isActive { get; private set; } // false par défaut
+        public Price Price { get; private set; } // Invariant encapsulé dans Price
+        public bool IsActive { get; private set; } // true par défaut
 
-        public Product() { 
-            this.isActive = true;
+        public Product(Price price) : this(Guid.NewGuid(), price) { }
+
+        public Product(Guid id, Price price)
+        {
+            Id = id == Guid.Empty ? Guid.NewGuid() : id;
+            Price = price; // Price valide par construction
+            IsActive = true;
         }
 
-        public void Changeprice(decimal newPrice)
+        public void ChangePrice(Price newPrice)
         {
-            // Règle métier : le prix ne peut pas être inférieur à zéro.
-            if (newPrice <= 0)
-            {
-                throw new DomainExeception("Le prix ne peut pas être inférieur à zéro.");
-            }
-
-            // Règle métier :le produit ne doit pas être inactif
-            if (!isActive)
+            // Règle métier : le produit ne doit pas être inactif
+            if (!IsActive)
             {
                 throw new DomainExeception("Le produit est inactif.");
             }
 
-            //seul endroit ou on change le prix. 
-            this.Price = newPrice;
+            // Invariant déjà garanti par Price
+            Price = newPrice;
         }
+
+        public void Deactivate() => IsActive = false;
+        public void Activate() => IsActive = true;
     }
 }
