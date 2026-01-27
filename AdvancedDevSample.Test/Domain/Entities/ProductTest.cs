@@ -3,13 +3,14 @@ using AdvancedDevSample.Domain.Execptions;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Xunit;
 
 namespace AdvancedDevSample.Test.Domain.Entities
 {
     public class ProductTest
     {
         [Fact]
-        public void JSP(){
+        public void ChangePrice_Shoulf_Update_Price_When_Product_Is_Active(){
             //Arrange : Je prépare un produit valider
             var product = new Product();
 
@@ -50,9 +51,21 @@ namespace AdvancedDevSample.Test.Domain.Entities
             product.ApplyDiscount(30);
 
             //Assert
+            Assert.Equal(70, product.Price);
 
         }
 
+        [Fact]
+        public void ApplyDiscount_Should_Throw_When_Resulting_Price_Is_Invalid()
+        {
+            // Arrange
+            var product = new Product();
+            product.ChangePrice(20); //valeur initiale
 
+            // Act & Assert
+           Assert.Throws<DomainExeception>(() => product.ApplyDiscount(30));
+
+        }
     }
 }
+
