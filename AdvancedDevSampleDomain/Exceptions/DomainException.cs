@@ -1,12 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace AdvancedDevSample.Domain.Exception
+namespace AdvancedDevSample.Domain.Exceptions
 {
-    public class DomainException : Exception
+    /// <summary>
+    /// Exception métier générique pour le domaine.
+    /// </summary>
+    public class DomainException : System.Exception
     {
-        public DomainException(string message) : base(message) { 
-        }
+        public DomainException(string message) : base(message) { }
+
+        public DomainException(string message, System.Exception innerException) : base(message, innerException) { }
     }
 }

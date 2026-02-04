@@ -1,25 +1,52 @@
 using AdvancedDevSample.Api.Middlewares;
+using System;
+using System.IO;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using AdvancedDevSample.Domain.Services;
+using AdvancedDevSample.Domain.Interfaces; // Ajouté pour IproductRepository
+using AdvancedDevSample.Infrastructure.Repositories; // Ajouté pour EfProductRepository
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// --- AJOUT DES SERVICES AU CONTENEUR (DI) ---
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+
+// Configuration Swagger/OpenAPI
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    var basePath = AppContext.BaseDirectory;
+    foreach (var xmlFile in Directory.GetFiles(basePath, "*.xml"))
+    {
+        options.IncludeXmlComments(xmlFile);
+    }
+});
+
+// Enregistrement des dépendances de l'application
+// C'est ici que l'on lie l'interface à son implémentation pour corriger l'erreur d'exécution
+builder.Services.AddScoped<IproductRepository, EfProductRepository>();
+builder.Services.AddScoped<ProductService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// --- CONFIGURATION DU PIPELINE HTTP ---
+
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+// Middleware personnalisé pour la gestion des erreurs
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 app.MapControllers();
 
 app.Run();

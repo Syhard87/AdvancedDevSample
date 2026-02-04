@@ -1,12 +1,13 @@
-﻿using AdvancedDevSample.Domain.Exception;
-using AdvancedDevSample.Domain.Execptions;
+﻿using System;
+using AdvancedDevSample.Domain.Exceptions;
 using AdvancedDevSample.Domain.ValueObjects;
-using System;
 
 namespace AdvancedDevSample.Domain.Entities
 {
     public class Product
     {
+        private Guid guid;
+
         /// <summary>
         /// Représente un produit vendable.
         /// </summary>
@@ -16,11 +17,23 @@ namespace AdvancedDevSample.Domain.Entities
 
         public Product(Price price) : this(Guid.NewGuid(), price) { }
 
-        public Product(Guid id, Price price)
+        public Product(Guid id, Price price,bool IsActive)
         {
             Id = id == Guid.Empty ? Guid.NewGuid() : id;
             Price = price; // Price valide par construction
             IsActive = true;
+        }
+
+        // Constructeur requis par certains ORMs ; protégé pour empêcher l'utilisation publique.
+        protected Product()
+        {
+            IsActive = true;
+        }
+
+        public Product(Guid guid, Price price)
+        {
+            this.guid = guid;
+            Price = price;
         }
 
         public void ChangePrice(Price newPrice)
@@ -28,7 +41,7 @@ namespace AdvancedDevSample.Domain.Entities
             // Règle métier : le produit ne doit pas être inactif
             if (!IsActive)
             {
-                throw new DomainExeception("Le produit est inactif.");
+                throw new DomainException("Le produit est inactif.");
             }
 
             // Invariant déjà garanti par Price
@@ -37,5 +50,10 @@ namespace AdvancedDevSample.Domain.Entities
 
         public void Deactivate() => IsActive = false;
         public void Activate() => IsActive = true;
+
+        public void ChangePrice(decimal newPriceValue)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

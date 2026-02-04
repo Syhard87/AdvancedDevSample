@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using AdvancedDevSample.Domain.Exception;
+using AdvancedDevSample.Domain.Exceptions;
 
 
-namespace AdvancedDevSample.Domain.Exception
+namespace AdvancedDevSample.Domain.Exceptions
 {
     public class InfrastructureException : Exception
     {

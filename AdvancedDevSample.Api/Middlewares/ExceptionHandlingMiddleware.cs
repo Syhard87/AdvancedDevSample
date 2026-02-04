@@ -1,10 +1,9 @@
-﻿using System.Net;
-using System.Text.Json;
+﻿using System.Text.Json;
 using AdvancedDevSample.Application.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System;
-using AdvancedDevSample.Domain.Exception;
+using System.Net; 
+using AdvancedDevSample.Domain.Exceptions;
 
 
 namespace AdvancedDevSample.Api.Middlewares

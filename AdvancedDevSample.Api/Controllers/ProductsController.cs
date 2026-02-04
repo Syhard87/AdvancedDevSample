@@ -1,6 +1,9 @@
-﻿using AdvancedDevSample.Domain.Exception;
+﻿using AdvancedDevSample.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using AdvancedDevSample.Domain.Services;
+using AdvancedDevSample.Application.DTOs;
+using System.Net; 
+
 
 namespace AdvancedDevSample.Api.Controllers
 {
@@ -27,10 +30,12 @@ namespace AdvancedDevSample.Api.Controllers
             {
                 return NotFound(ex.Message);
             }
-            catch (DomaineException ex)
+            catch (DomainException ex)
             {
-                return badRequest(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
     }
+
+
 }
