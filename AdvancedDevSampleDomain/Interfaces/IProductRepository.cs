@@ -4,7 +4,7 @@ using System.Text;
 using AdvancedDevSample.Domain.Entities;
 namespace AdvancedDevSample.Domain.Interfaces
 {
-    public interface IproductRepository
+    public interface IProductRepository
     {
         public void Save(Product product);
 

@@ -12,9 +12,9 @@ namespace AdvancedDevSample.Domain.Services
 {
     public class ProductService
     {
-        private readonly IproductRepository _repo;
+        private readonly IProductRepository _repo;
 
-        public ProductService(IproductRepository repo)
+        public ProductService(IProductRepository repo)
         {
             _repo = repo;
         }

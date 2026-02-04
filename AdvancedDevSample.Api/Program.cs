@@ -4,7 +4,7 @@ using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using AdvancedDevSample.Domain.Services;
-using AdvancedDevSample.Domain.Interfaces; // Ajouté pour IproductRepository
+using AdvancedDevSample.Domain.Interfaces; // Ajouté pour IProductRepository
 using AdvancedDevSample.Infrastructure.Repositories; // Ajouté pour EfProductRepository
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -27,8 +27,9 @@ builder.Services.AddSwaggerGen(options =>
 
 // Enregistrement des dépendances de l'application
 // C'est ici que l'on lie l'interface à son implémentation pour corriger l'erreur d'exécution
-builder.Services.AddScoped<IproductRepository, EfProductRepository>();
+builder.Services.AddScoped<IProductRepository, EfProductRepository>();
 builder.Services.AddScoped<ProductService>();
+
 
 var app = builder.Build();
 
