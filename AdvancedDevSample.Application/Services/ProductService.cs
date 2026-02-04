@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AdvancedDevSample.Domain.Services
 {
-    internal class ProductService
+    public class ProductService
     {
     }
 }

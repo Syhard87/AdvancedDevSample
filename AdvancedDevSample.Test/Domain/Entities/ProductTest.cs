@@ -34,7 +34,7 @@ namespace AdvancedDevSample.Test.Domain.Entities
             typeof(Product).GetProperty(nameof(Product.IsActive))!.SetValue(product, false);
 
             //Act & Assert
-            var exception = Assert.Throws<DomainExeception>(() => product.ChangePrice(20));
+            var exception = Assert.Throws<DomainException>(() => product.ChangePrice(20));
 
             Assert.Equal("Impossible de modifier un produit inactif.", exception.Message);
 
@@ -63,7 +63,7 @@ namespace AdvancedDevSample.Test.Domain.Entities
             product.ChangePrice(20); //valeur initiale
 
             // Act & Assert
-           Assert.Throws<DomainExeception>(() => product.ApplyDiscount(30));
+           Assert.Throws<DomainException>(() => product.ApplyDiscount(30));
 
         }
     }

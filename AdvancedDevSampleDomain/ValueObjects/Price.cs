@@ -1,3 +1,4 @@
+using AdvancedDevSample.Domain.Exception;
 using AdvancedDevSample.Domain.Execptions;
 
 namespace AdvancedDevSample.Domain.ValueObjects
@@ -5,10 +6,8 @@ namespace AdvancedDevSample.Domain.ValueObjects
     /// <summary>
     /// Value Object représentant un prix strictement positif.
     /// </summary>
-    public readonly record struct Price
+    public readonly record struct Price(decimal Value)
     {
-        public decimal Value { get; init; }
-
         public Price(decimal value)
         {
             if (value <= 0m)

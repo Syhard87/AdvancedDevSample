@@ -1,6 +1,7 @@
-﻿using System;
+﻿using AdvancedDevSample.Domain.Exception;
 using AdvancedDevSample.Domain.Execptions;
 using AdvancedDevSample.Domain.ValueObjects;
+using System;
 
 namespace AdvancedDevSample.Domain.Entities
 {
