@@ -5,19 +5,16 @@ Ce projet est une API RESTful construite avec **.NET 8**, suivant les principes 
 
 [![CI/CD & Documentation](https://github.com/Syhard87/AdvancedDevSample/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Syhard87/AdvancedDevSample/actions/workflows/ci-cd.yml)
 
-## 🛠️ Stack Technique
+## 🗺️ Vue d'ensemble du système
 
-| Composant | Technologie | Usage |
-| :--- | :--- | :--- |
-| **Framework** | .NET 8 (C#) | Cœur de l'application |
-| **Base de Données** | SQLite | Persistance légère (Entity Framework Core) |
-| **Architecture** | Hexagonale / Clean | Séparation des responsabilités |
-| **Tests** | xUnit & FluentAssertions | Tests Unitaires & Intégration |
-| **CI/CD** | GitHub Actions | Automatisation des tests et du déploiement |
-| **Auth** | JWT (JSON Web Tokens) | Sécurisation de l'API |
+Voici comment l'application s'intègre dans son environnement :
 
-## 🏁 Démarrage Rapide
+```mermaid
+graph LR
+    User([Utilisateur / Client]) -- HTTPS + JWT --> API[API .NET 8]
+    API -- Lecture/Écriture --> DB[(Base de Données SQLite)]
+    API -- Logs --> Console[Sortie Console]
 
-1. **Cloner le dépôt**
-   ```bash
-   git clone [https://github.com/Syhard87/AdvancedDevSample.git](https://github.com/Syhard87/AdvancedDevSample.git)
+    style API fill:#6A0DAD,stroke:#333,stroke-width:2px,color:white
+    style DB fill:#008000,stroke:#333,stroke-width:2px,color:white
+    style User fill:#FFA500,stroke:#333,stroke-width:2px,color:white
