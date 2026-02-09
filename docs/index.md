@@ -18,3 +18,4 @@ graph LR
     style API fill:#6A0DAD,stroke:#333,stroke-width:2px,color:white
     style DB fill:#008000,stroke:#333,stroke-width:2px,color:white
     style User fill:#FFA500,stroke:#333,stroke-width:2px,color:white
+```
