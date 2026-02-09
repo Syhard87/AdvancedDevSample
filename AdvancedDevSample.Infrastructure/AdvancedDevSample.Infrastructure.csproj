@@ -1,18 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AdvancedDevSampleDomain\AdvancedDevSample.Domain.csproj" />
+    <ProjectReference Include="..\AdvancedDevSample.Application\AdvancedDevSample.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="ExternalServices\" />
     <Folder Include="Persistance\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
   </ItemGroup>
 
 </Project>

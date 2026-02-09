@@ -6,54 +6,69 @@ namespace AdvancedDevSample.Domain.Entities
 {
     public class Product
     {
-        private Guid guid;
+        public Guid Id { get; private set; }
+        public string Name { get; private set; }
+        public Price Price { get; private set; }
+        public bool IsActive { get; private set; }
 
-        /// <summary>
-        /// Représente un produit vendable.
-        /// </summary>
-        public Guid Id { get; private set; } // Identité
-        public Price Price { get; private set; } // Invariant encapsulé dans Price
-        public bool IsActive { get; private set; } // true par défaut
+        // --- AJOUT TECHNIQUE ---
+        // Ce constructeur est requis par EF Core mais ne doit pas être utilisé par nous.
+        // On désactive l'alerte "Non-nullable property" juste pour ces lignes.
+#pragma warning disable CS8618
+        protected Product() { }
+#pragma warning restore CS8618
 
-        public Product(Price price) : this(Guid.NewGuid(), price) { }
-
-        public Product(Guid id, Price price,bool IsActive)
+        // Constructeur principal (Celui qu'on utilise)
+        public Product(string name, Price price)
         {
-            Id = id == Guid.Empty ? Guid.NewGuid() : id;
-            Price = price; // Price valide par construction
-            IsActive = true;
-        }
+            if (string.IsNullOrWhiteSpace(name))
+                throw new DomainException("Le nom du produit est obligatoire.");
 
-        // Constructeur requis par certains ORMs ; protégé pour empêcher l'utilisation publique.
-        protected Product()
-        {
-            IsActive = true;
-        }
-
-        public Product(Guid guid, Price price)
-        {
-            this.guid = guid;
+            Id = Guid.NewGuid();
+            Name = name;
             Price = price;
+            IsActive = true;
         }
 
-        public void ChangePrice(Price newPrice)
+        // Constructeur complet (Pour reconstruire l'objet depuis la BDD)
+        public Product(Guid id, string name, Price price, bool isActive)
         {
-            // Règle métier : le produit ne doit pas être inactif
-            if (!IsActive)
-            {
-                throw new DomainException("Le produit est inactif.");
-            }
+            Id = id;
+            Name = name;
+            Price = price;
+            IsActive = isActive;
+        }
 
-            // Invariant déjà garanti par Price
+        // Méthode de mise à jour du prix (Utilisée par ProductService)
+        public void UpdatePrice(Price newPrice)
+        {
+            if (!IsActive)
+                throw new DomainException("Impossible de modifier un produit inactif.");
+
             Price = newPrice;
+        }
+
+        // Méthode de rabais (Utilisée par les Tests)
+        public void ApplyDiscount(decimal discountAmount)
+        {
+            if (!IsActive)
+                throw new DomainException("Impossible de modifier un produit inactif.");
+
+            // On calcule le nouveau montant
+            decimal newAmount = Price.Value - discountAmount;
+
+            // On recrée un objet Price (qui vérifiera tout seul si < 0)
+            Price = new Price(newAmount);
+        }
+
+        public void UpdateName(string newName)
+        {
+            if (string.IsNullOrWhiteSpace(newName))
+                throw new DomainException("Le nom ne peut pas être vide.");
+            Name = newName;
         }
 
         public void Deactivate() => IsActive = false;
         public void Activate() => IsActive = true;
-
-        public void ChangePrice(decimal newPriceValue)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

@@ -1,13 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks; // Nécessaire pour le mode asynchrone
 using AdvancedDevSample.Domain.Entities;
+
 namespace AdvancedDevSample.Domain.Interfaces
 {
     public interface IProductRepository
     {
-        public void Save(Product product);
+        // R (Read) - Récupérer tout
+        Task<IEnumerable<Product>> GetAllAsync();
 
-        public Product GetById(Guid id);
+        // R (Read) - Récupérer un seul (peut renvoyer null si pas trouvé, d'où le "?")
+        Task<Product?> GetByIdAsync(Guid id);
+
+        // C (Create) - Ajouter
+        Task AddAsync(Product product);
+
+        // U (Update) - Mettre à jour
+        Task UpdateAsync(Product product);
+
+        // D (Delete) - Supprimer
+        Task DeleteAsync(Guid id);
     }
 }

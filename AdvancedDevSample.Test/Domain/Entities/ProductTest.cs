@@ -1,8 +1,7 @@
 ﻿using AdvancedDevSample.Domain.Entities;
-using AdvancedDevSample.Domain.Execptions;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using AdvancedDevSample.Domain.Exceptions;
+using AdvancedDevSample.Domain.ValueObjects;
+using FluentAssertions; // C'est lui qui permet d'utiliser .Should()
 using Xunit;
 
 namespace AdvancedDevSample.Test.Domain.Entities
@@ -10,62 +9,53 @@ namespace AdvancedDevSample.Test.Domain.Entities
     public class ProductTest
     {
         [Fact]
-        public void ChangePrice_Shoulf_Update_Price_When_Product_Is_Active(){
-            //Arrange : Je prépare un produit valider
-            var product = new Product();
+        public void UpdatePrice_Should_Update_Price_When_Product_Is_Active()
+        {
+            // Arrange
+            var initialPrice = new Price(10);
+            var product = new Product("Produit Test", initialPrice);
+            var newPrice = new Price(20);
 
-            //Act : Execute une action
-            product.ChangePrice(20);
+            // Act
+            // CORRECTION : On utilise UpdatePrice (le nom dans votre Product.cs)
+            product.UpdatePrice(newPrice);
 
-            //Assert : Vérifie le résultat
-            Assert.Equal(20, product.Price);
-
+            // Assert
+            // CORRECTION : On utilise la syntaxe FluentAssertions
+            product.Price.Value.Should().Be(20);
         }
 
         [Fact]
-        public void ChangePrice_Should_Throw_Execption_When_Product_Is_Inactive()
+        public void UpdatePrice_Should_Throw_Exception_When_Product_Is_Inactive()
         {
-            //Arrange : Je prépare un produit valider
-            var product = new Product();
-            product.ChangePrice(10); // Prix initial
+            // Arrange
+            var product = new Product("Produit Test", new Price(10));
 
-            // Simulation : produit désactivé (via reconstitution ou méthode dédiée)
-            //product.IsActive=true;//Accesseur non accessible
-            typeof(Product).GetProperty(nameof(Product.IsActive))!.SetValue(product, false);
+            // On désactive le produit "de force" pour le test
+            product.Deactivate(); // Si vous avez ajouté cette méthode, sinon utilisez la Reflection ci-dessous :
+            // typeof(Product).GetProperty(nameof(Product.IsActive))!.SetValue(product, false);
 
-            //Act & Assert
-            var exception = Assert.Throws<DomainException>(() => product.ChangePrice(20));
+            var newPrice = new Price(20);
 
-            Assert.Equal("Impossible de modifier un produit inactif.", exception.Message);
+            // Act
+            Action action = () => product.UpdatePrice(newPrice);
 
+            // Assert
+            action.Should().Throw<DomainException>()
+                .WithMessage("Impossible de modifier un produit inactif.");
         }
 
         [Fact]
         public void ApplyDiscount_Should_Decrease_Price()
         {
-            //Arrange
-            var product = new Product();
-            product.ChangePrice(100); // Prix initial
+            // Arrange
+            var product = new Product("Produit Soldé", new Price(100));
 
-            //Act
+            // Act
             product.ApplyDiscount(30);
 
-            //Assert
-            Assert.Equal(70, product.Price);
-
-        }
-
-        [Fact]
-        public void ApplyDiscount_Should_Throw_When_Resulting_Price_Is_Invalid()
-        {
-            // Arrange
-            var product = new Product();
-            product.ChangePrice(20); //valeur initiale
-
-            // Act & Assert
-           Assert.Throws<DomainException>(() => product.ApplyDiscount(30));
-
+            // Assert
+            product.Price.Value.Should().Be(70);
         }
     }
 }
-

@@ -4,38 +4,43 @@ using AdvancedDevSample.Domain.ValueObjects;
 
 namespace AdvancedDevSample.Infrastructure.Repositories
 {
-    /// <summary>
-    /// Entité de persistence simple pour les produits (pour EF / mapping).
-    /// </summary>
     public class ProductEntity
     {
         public Guid Id { get; set; }
+        public string Name { get; set; } = string.Empty; // Le nom est obligatoire
         public decimal Price { get; set; }
         public bool IsActive { get; set; }
 
         public ProductEntity() { }
 
-        public ProductEntity(Guid id, decimal price, bool isActive)
+        public ProductEntity(Guid id, string name, decimal price, bool isActive)
         {
             Id = id;
+            Name = name;
             Price = price;
             IsActive = isActive;
         }
 
-        /// <summary>
-        /// Convertit l'entité de persistence en objet domaine.
-        /// </summary>
+        // C'est ICI que l'erreur se produisait
         public Product ToDomain()
         {
-            var domain = new Product(Id, new Price(Price));
-            if (!IsActive) domain.Deactivate();
-            return domain;
+            // On utilise le bon ordre : Id, Name, Price, IsActive
+            return new Product(
+                Id,
+                Name,
+                new Price(Price),
+                IsActive
+            );
         }
 
-        /// <summary>
-        /// Crée une entité de persistence à partir de l'objet domaine.
-        /// </summary>
-        public static ProductEntity FromDomain(Product product) =>
-            new ProductEntity(product.Id, product.Price.Value, product.IsActive);
+        public static ProductEntity FromDomain(Product product)
+        {
+            return new ProductEntity(
+                product.Id,
+                product.Name,
+                product.Price.Value,
+                product.IsActive
+            );
+        }
     }
 }
