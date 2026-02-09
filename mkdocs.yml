@@ -1,11 +1,42 @@
-site_name: Documentation AdvancedDevSample
+site_name: AdvancedDevSample
+site_url: https://syhard87.github.io/AdvancedDevSample/
+repo_url: https://github.com/Syhard87/AdvancedDevSample
+repo_name: Syhard87/AdvancedDevSample
+
 theme:
   name: material
   palette:
-    primary: indigo
-    accent: indigo
+    - scheme: default
+      primary: indigo
+      accent: purple
+      toggle:
+        icon: material/brightness-7
+        name: Mode Clair
+    - scheme: slate
+      primary: indigo
+      accent: purple
+      toggle:
+        icon: material/brightness-4
+        name: Mode Sombre
+  features:
+    - content.code.copy
+    - navigation.tabs
+    - navigation.sections
+
+# Activation des diagrammes Mermaid
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
 
 nav:
   - Accueil: index.md
   - Architecture: architecture.md
-  - API Reference: api.md
+  - Sécurité & Auth: auth.md
+  - Guide de Dév: guide.md
