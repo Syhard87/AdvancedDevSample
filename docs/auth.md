@@ -1,38 +1,71 @@
-# 🔐 Sécurité & Authentification
+# Authentification et Sécurité
 
-L'API est sécurisée via le standard **JWT (JSON Web Token)**. Elle est "Stateless" : le serveur ne garde pas de session en mémoire, tout est contenu dans le token signé.
+La sécurité de **AdvancedDevSample** repose sur un système d'authentification moderne utilisant **JWT (JSON Web Tokens)** et un stockage sécurisé des mots de passe.
 
-## Flux d'Authentification (Workflow)
+## Vue d'ensemble
 
-Ce diagramme montre comment un utilisateur obtient son accès et comment l'API valide ses requêtes suivantes.
+- **Standard** : OAuth2 / OpenID Connect (implémentation simplifiée via Bearer Token).
+- **Token** : JWT signé avec une clé symétrique (HMACSHA256).
+- **Mots de passe** : Hachés avec l'algorithme **BCrypt** avant stockage.
+
+## Configuration Technique (`Program.cs`)
+
+L'API configure la sécurité au démarrage de l'application :
+
+1.  **Schéma d'Authentification** : Défini sur `JwtBearerDefaults.AuthenticationScheme`.
+2.  **Validation du Token** :
+    - `ValidateIssuer` & `ValidateAudience` : Vérifie que le token vient bien de notre serveur.
+    - `ValidateLifetime` : Vérifie que le token n'a pas expiré.
+    - `IssuerSigningKey` : Vérifie la signature cryptographique du token.
+
+## Gestion des Utilisateurs (`AuthController.cs`)
+
+Le contrôleur d'authentification gère deux actions principales :
+
+### 1. Inscription (`/register`)
+Lorsqu'un utilisateur s'inscrit :
+1.  L'API vérifie si l'email existe déjà.
+2.  Le mot de passe est hashé via `BCrypt.Net.BCrypt.HashPassword(password)`.
+3.  Seul le **Hash** est sauvegardé en base de données via EF Core.
+
+### 2. Connexion (`/login`)
+Lorsqu'un utilisateur se connecte :
+1.  L'API récupère l'utilisateur par son email.
+2.  Elle compare le mot de passe fourni avec le hash stocké via `BCrypt.Net.BCrypt.Verify()`.
+3.  Si valide, un **Token JWT** est généré contenant l'ID et l'Email de l'utilisateur.
+
+## Flux d'Authentification
+
+Le diagramme suivant montre comment un client obtient et utilise un token pour accéder à une ressource protégée.
 
 ```mermaid
 sequenceDiagram
-    autonumber
-    participant Client as Utilisateur (Postman/Swagger)
-    participant API as API (.NET 8)
-    participant DB as Base de Données (SQLite)
+    participant C as Client (Postman/Web)
+    participant API as AuthController
+    participant DB as Base de Données
+    participant P as SecureController
 
-    Note over Client, API: 1. Phase de Connexion
-    Client->>API: POST /api/auth/login {email, password}
-    API->>DB: Vérifie l'existence et le hash du mot de passe
+    C->>API: POST /api/auth/login {email, password}
+    API->>DB: Rechercher User par Email
+    DB-->>API: User (avec PasswordHash)
     
-    alt Identifiants Valides
-        DB-->>API: Utilisateur OK
-        API->>API: Génération du Token JWT (Signé avec clé secrète)
-        API-->>Client: 200 OK + { "token": "ey..." }
-    else Identifiants Invalides
-        API-->>Client: 401 Unauthorized
+    API->>API: Vérifier Hash (BCrypt)
+    
+    alt Mot de passe valide
+        API->>API: Générer Token JWT
+        API-->>C: 200 OK { token: "eyJhbGci..." }
+    else Mot de passe invalide
+        API-->>C: 401 Unauthorized
     end
 
-    Note over Client, API: 2. Phase d'Accès aux Ressources
-    Client->>API: GET /api/products (Header: Bearer ey...)
-    API->>API: Vérification de la signature et expiration du Token
+    Note over C, P: Appel d'une route sécurisée
+
+    C->>P: GET /api/products (Header: Bearer eyJhbGci...)
+    P->>P: Valider Signature & Expiration du Token
     
     alt Token Valide
-        API->>DB: Récupération des données
-        DB-->>API: Liste des produits
-        API-->>Client: 200 OK + [JSON Data]
-    else Token Expiré ou Falsifié
-        API-->>Client: 401 Unauthorized (Accès refusé)
+        P-->>C: 200 OK [Liste des produits]
+    else Token Invalide/Expiré
+        P-->>C: 401 Unauthorized
     end
+```
