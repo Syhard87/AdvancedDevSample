@@ -12,9 +12,13 @@ namespace AdvancedDevSample.Infrastructure.Persistence
 
         public DbSet<Product> Products { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+
             // Syntaxe "Fluent" simplifiée
             // On configure l'entité Product
             modelBuilder.Entity<Product>()

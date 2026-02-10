@@ -79,10 +79,15 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<IProductRepository, SqliteProductRepository>();
 
 // B. Services Applicatifs
+// B. Services Applicatifs
 builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 // C. Service d'Authentification (JWT)
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
+
+// D. Repositories
+builder.Services.AddScoped<IOrderRepository, SqliteOrderRepository>();
 
 var app = builder.Build();
 
