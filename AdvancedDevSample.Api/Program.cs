@@ -88,6 +88,10 @@ builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 
 // D. Repositories
 builder.Services.AddScoped<IOrderRepository, SqliteOrderRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+// E. Other Services
+builder.Services.AddScoped<AuthService>();
 
 var app = builder.Build();
 

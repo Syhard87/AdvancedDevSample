@@ -1,10 +1,8 @@
-﻿using AdvancedDevSample.Application.DTOs;
-using AdvancedDevSample.Application.Interfaces;
-using AdvancedDevSample.Domain.Entities;
-using AdvancedDevSample.Infrastructure.Persistence;
+﻿using System;
+using System.Threading.Tasks;
+using AdvancedDevSample.Application.DTOs;
+using AdvancedDevSample.Application.Services; // Ensure this is using Services, not Interfaces for class injection
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BCrypt.Net; // Indispensable pour la sécurité
 
 namespace AdvancedDevSample.Api.Controllers
 {
@@ -12,59 +10,36 @@ namespace AdvancedDevSample.Api.Controllers
     [Route("api/auth")]
     public class AuthController : ControllerBase
     {
-        private readonly IJwtProvider _jwtProvider;
-        private readonly ApplicationDbContext _context;
+        private readonly AuthService _authService;
 
-        public AuthController(IJwtProvider jwtProvider, ApplicationDbContext context)
+        public AuthController(AuthService authService)
         {
-            _jwtProvider = jwtProvider;
-            _context = context;
+            _authService = authService;
         }
 
-        // --- C'EST CETTE PARTIE QUI VOUS MANQUE ---
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] LoginRequest request)
         {
-            // 1. On vérifie si l'email existe déjà
-            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+            try
             {
-                return BadRequest("Cet email est déjà utilisé.");
+                var result = await _authService.RegisterAsync(request);
+                return Ok(result);
             }
-
-            // 2. On crée l'utilisateur
-            var user = new User
+            catch (InvalidOperationException ex)
             {
-                Email = request.Email,
-                // 3. On HACHE le mot de passe (sécurité)
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password)
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return Ok("Compte créé avec succès ! Vous pouvez vous connecter.");
+                return BadRequest(ex.Message);
+            }
         }
-        // ------------------------------------------
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            var token = await _authService.LoginAsync(request);
 
-            if (user == null)
+            if (token == null)
             {
                 return Unauthorized("Email ou mot de passe incorrect.");
             }
-
-            // On vérifie le Hash
-            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
-
-            if (!isPasswordValid)
-            {
-                return Unauthorized("Email ou mot de passe incorrect.");
-            }
-
-            string token = _jwtProvider.GenerateToken(user.Id, user.Email);
 
             return Ok(new { token = token });
         }
